@@ -1,6 +1,5 @@
 import {randInt} from "./utils";
 import Team from "./Nation/Team";
-import PositionedCharacter from "./PositionedCharacter";
 
 function generateCharacters(nation, characterCount, maxLevel){
   const characters = [];

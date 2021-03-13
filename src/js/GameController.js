@@ -1,5 +1,5 @@
 import themes from "./themes";
-import {nationHumans, nationUndead} from "./Nation/nations";
+import {nations} from "./Nation/nations";
 import {generateTeam} from "./generators";
 
 export default class GameController {
@@ -11,24 +11,15 @@ export default class GameController {
   init() {
     this.gamePlay.drawUi(themes.prairie);
 
-    const playerTeam = generateTeam(
-      nationHumans,
-      2,
-      1,
-      'left',
-      this.gamePlay.boardSize
-    );
+    this.teams = {
+      player: generateTeam(nations.humans, 2, 1, 'left', this.gamePlay.boardSize),
+      ai: generateTeam(nations.undead, 2, 1, 'right', this.gamePlay.boardSize),
+    }
 
-    const aiTeam = generateTeam(
-      nationUndead,
-      2,
-      1,
-      'right',
-      this.gamePlay.boardSize
-    );
-    this.gamePlay.redrawPositions([...playerTeam, ...aiTeam]);
-    // TODO: add event listeners to gamePlay events
-    // TODO: load saved stated from stateService
+    this.gamePlay.redrawPositions([...this.teams.player, ...this.teams.ai]);
+    this.gamePlay.addCellEnterListener(this.onCellEnter);
+    this.gamePlay.addCellLeaveListener(this.onCellLeave);
+    this.gamePlay.addCellClickListener(this.onCellClick);
   }
 
   onCellClick(index) {
