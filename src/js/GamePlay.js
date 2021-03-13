@@ -1,8 +1,8 @@
-import { calcHealthLevel, calcTileType } from './utils';
+import {calcHealthLevel, calcTileType} from './utils';
 
 export default class GamePlay {
-  constructor() {
-    this.boardSize = 8;
+  constructor(boardSize = 8) {
+    this.boardSize = boardSize;
     this.container = null;
     this.boardEl = null;
     this.cells = [];
@@ -203,7 +203,7 @@ export default class GamePlay {
   hideCellTooltip(index) {
     this.cells[index].title = '';
   }
-  
+
   showDamage(index, damage) {
     return new Promise((resolve) => {
       const cell = this.cells[index];
