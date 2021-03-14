@@ -2,15 +2,6 @@ export function randInt(max, min = 0) {
   return Math.floor(min + Math.random() * (max + 1 - min));
 }
 
-export function intDiv(a, b) {
-  return (a - a % b) / b;
-}
-
-export function addZeros(number, order) {
-  if (order <= 1) return '' + number;
-  return addZeros(intDiv(number, 10), order - 1) + number % 10;
-}
-
 export function calcTileType(index, boardSize) {
   let columnNumber = index % boardSize
   let rowNumber = (index - columnNumber) / boardSize;
@@ -30,6 +21,10 @@ export function calcTileType(index, boardSize) {
   }
 
   return rowMode + columnMode || 'center';
+}
+
+export function getTooltipMsg({level, attack, defence, health} = character) {
+  return `🎖${level} ⚔${attack} 🛡${defence} ❤${health}`;
 }
 
 export function calcHealthLevel(health) {

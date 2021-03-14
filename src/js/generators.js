@@ -4,7 +4,7 @@ import Team from "./Nation/Team";
 function generateCharacters(nation, characterCount, maxLevel){
   const characters = [];
   while (characters.length < characterCount) {
-    characters.push(nation.newChar(randInt(maxLevel) + 1));
+    characters.push(nation.newChar(maxLevel));
   }
   return characters;
 }

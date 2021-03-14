@@ -11,6 +11,8 @@ export default class Nation {
   };
 
   newChar(maxLevel) {
-    return new this.allowedTypes[randInt(this.allowedTypes.length - 1)](randInt(maxLevel));
+    const character = new this.allowedTypes[randInt(this.allowedTypes.length - 1)](randInt(maxLevel, 1));
+    character.nation = this.title;
+    return character;
   }
 }

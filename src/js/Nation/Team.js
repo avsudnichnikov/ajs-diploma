@@ -10,6 +10,10 @@ export default class Team {
     return this.persons.length;
   }
 
+  findByPos(position){
+    return this.persons.find((item) => item.position === position) || null;
+  }
+
   add(member) {
     this.persons.push(member);
   }

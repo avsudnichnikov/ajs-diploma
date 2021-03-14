@@ -1,55 +1,55 @@
 import {calcTileType} from '../../utils';
 
 test('top-left', () => {
-  const received = 'top-left';
-  const expected = calcTileType(0, 3)
-  expect(expected).toBe(received);
+  const expected = 'top-left';
+  const received = calcTileType(0, 3);
+  expect(received).toBe(expected);
 });
 
 test('top', () => {
-  const received = 'top';
-  const expected = calcTileType(1, 3)
-  expect(expected).toBe(received);
+  const expected = 'top';
+  const received = calcTileType(1, 3);
+  expect(received).toBe(expected);
 });
 
 test('top-right', () => {
-  const received = 'top-right';
-  const expected = calcTileType(2, 3)
-  expect(expected).toBe(received);
+  const expected = 'top-right';
+  const received = calcTileType(2, 3);
+  expect(received).toBe(expected);
 });
 
 test('left', () => {
-  const received = 'left';
-  const expected = calcTileType(3, 3)
-  expect(expected).toBe(received);
+  const expected = 'left';
+  const received = calcTileType(3, 3);
+  expect(received).toBe(expected);
 });
 
 test('center', () => {
-  const received = 'center';
-  const expected = calcTileType(4, 3)
-  expect(expected).toBe(received);
+  const expected = 'center';
+  const received = calcTileType(4, 3);
+  expect(received).toBe(expected);
 });
 
 test('right', () => {
-  const received = 'right';
-  const expected = calcTileType(5, 3)
-  expect(expected).toBe(received);
+  const expected = 'right';
+  const received = calcTileType(5, 3);
+  expect(received).toBe(expected);
 });
 
 test('bottom-left', () => {
-  const received = 'bottom-left';
-  const expected = calcTileType(6, 3)
-  expect(expected).toBe(received);
+  const expected = 'bottom-left';
+  const received = calcTileType(6, 3);
+  expect(received).toBe(expected);
 });
 
 test('bottom', () => {
-  const received = 'bottom';
-  const expected = calcTileType(7, 3)
-  expect(expected).toBe(received);
+  const expected = 'bottom';
+  const received = calcTileType(7, 3);
+  expect(received).toBe(expected);
 });
 
 test('bottom-right', () => {
-  const received = 'bottom-right';
-  const expected = calcTileType(8, 3)
-  expect(expected).toBe(received);
+  const expected = 'bottom-right';
+  const received = calcTileType(8, 3);
+  expect(received).toBe(expected);
 });
