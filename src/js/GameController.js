@@ -2,12 +2,21 @@ import themes from './themes';
 import {nations} from './Nation/nations';
 import {getTooltipMsg} from './utils';
 import Player from './Player/Player';
+import cursors from "./cursors";
 
 export default class GameController {
   constructor(gamePlay, stateService) {
     this.gamePlay = gamePlay;
     this.stateService = stateService;
     this.state = this.stateService.gameState;
+    this.hoverCell = -1;
+    this.actions = {
+      attack: 'attack',
+      move: 'move',
+      change: 'change',
+      self: 'self',
+      nothing: null,
+    };
   }
 
   init() {
@@ -28,8 +37,6 @@ export default class GameController {
 
     this.gamePlay.drawUi(themes.prairie);
 
-    console.log(this.getPersons());
-
     this.gamePlay.redrawPositions(this.getPersons());
 
     this.gamePlay.addCellEnterListener(this.onCellEnter.bind(this));
@@ -38,17 +45,25 @@ export default class GameController {
   }
 
   onCellClick(index) {
-    const person = this.getPersByPos(index, this.state.turn);
-
-    this.gamePlay.deselectCell(this.selectedCell);
-
-    if (person) {
-      this.selectedCell = index;
-      this.gamePlay.selectCell(index);
+    if (this.selectedPerson) {
+      const action = this.getSelectedPersAllowableAction(index);
+      if (action === this.actions.change){
+        this.selectPerson(index);
+      }
+      if (action === this.actions.nothing){
+        this.deselect();
+      }
+    } else {
+      this.selectPerson(index);
     }
   }
 
   onCellEnter(index) {
+    if (this.selectedPerson) {
+      this.setCell(index, this.getSelectedPersAllowableAction(index));
+    } else {
+      this.gamePlay.setCursor(cursors.auto)
+    }
     this.showTooltip(index);
   }
 
@@ -58,7 +73,7 @@ export default class GameController {
 
   getPersons(playerIndex, directSearch) {
     const player = (typeof (playerIndex) === 'number') ? playerIndex : -1;
-    const direct = directSearch || typeof (playerIndex) === 'number';
+    const direct = directSearch || (typeof (playerIndex) === 'number' && typeof (directSearch) !== 'boolean');
     const persons = [];
     this.state.players.forEach((current, index) => {
       if ((direct && (index === player)) || (!direct && (index !== player))) {
@@ -72,10 +87,90 @@ export default class GameController {
     return this.getPersons(player, direct).find((item) => item.position === pos) || null;
   }
 
+  getSelectedPersAllowableAction(index) {
+    if (this.selectedPerson.position === index) {
+      return this.actions.self;
+    }
+    if (this.canSelectedPersMove(index)) {
+      return this.actions.move;
+    }
+    if (this.canSelectedPersAttack(index)) {
+      return this.actions.attack;
+    }
+    if (this.canSelectedPersChange(index)) {
+      return this.actions.change;
+    }
+    return this.actions.nothing;
+  }
+
+  canSelectedPersMove(index) {
+    const canMoveCell = this.selectedPerson.isMoveCell(index, this.gamePlay.boardSize);
+    const isEmptyCell = !this.getPersByPos(index);
+    return canMoveCell && isEmptyCell;
+  }
+
+  canSelectedPersAttack(index) {
+    const canAttackCell = this.selectedPerson.isAttackCell(index, this.gamePlay.boardSize);
+    const isEnemyCell = !!this.getEnemyPers(index);
+    return canAttackCell && isEnemyCell;
+  }
+
+  canSelectedPersChange(index) {
+    return !!this.getPersByPos(index, this.state.turn);
+  }
+
+  getEnemyPers(index) {
+    return this.getPersByPos(index, this.state.turn, false);
+  }
+
   showTooltip(index) {
     const person = this.getPersByPos(index);
     if (person) {
       this.gamePlay.showCellTooltip(getTooltipMsg(person.character), index);
+    }
+  }
+
+  setCell(index, type) {
+    if (this.hoverCell >= 0 && this.hoverCell !== this.selectedPerson.position) {
+      this.gamePlay.deselectCell(this.hoverCell);
+    }
+    if (type === this.actions.self) {
+      this.gamePlay.setCursor(cursors.pointer);
+      this.hoverCell = index;
+    }
+    if (type === this.actions.attack) {
+      this.gamePlay.selectCell(index, 'red');
+      this.gamePlay.setCursor(cursors.crosshair);
+      this.hoverCell = index;
+    }
+    if (type === this.actions.move) {
+      this.gamePlay.selectCell(index, 'green');
+      this.gamePlay.setCursor(cursors.pointer);
+      this.hoverCell = index;
+    }
+    if (type === this.actions.change) {
+      this.gamePlay.setCursor(cursors.pointer);
+      this.hoverCell = index;
+    }
+    if (type === this.actions.nothing) {
+      this.gamePlay.setCursor(cursors.notallowed);
+      this.hoverCell = index;
+    }
+  }
+
+  selectPerson(index){
+    const person = this.getPersByPos(index, this.state.turn);
+    this.deselect();
+    if (person) {
+      this.selectedPerson = person;
+      this.gamePlay.selectCell(index);
+    }
+  }
+
+  deselect() {
+    if (this.selectedPerson) {
+      this.gamePlay.deselectCell(this.selectedPerson.position);
+      this.selectedPerson = undefined;
     }
   }
 }

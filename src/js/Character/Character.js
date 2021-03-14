@@ -1,9 +1,10 @@
 export default class Character {
-  constructor(level, type, attack = 0, defence = 0, range = 1) {
+  constructor(level, type, attack = 0, defence = 0, range = 1, step = 1) {
     this.type = type;
     this.range = range;
     this.attack = attack;
     this.defence = defence;
+    this.step = step;
     this.health = 50;
 
     if (new.target.name === 'Character') {

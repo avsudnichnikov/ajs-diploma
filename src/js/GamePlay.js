@@ -1,4 +1,4 @@
-import { calcHealthLevel, calcTileType } from './utils';
+import {calcHealthLevel, calcTileType} from './utils';
 
 export default class GamePlay {
   constructor(boardSize = 8) {
@@ -191,10 +191,8 @@ export default class GamePlay {
   }
 
   deselectCell(index) {
-    if (typeof (index) === 'number') {
-      const cell = this.cells[index];
-      cell.classList.remove(...Array.from(cell.classList).filter((o) => o.startsWith('selected')));
-    }
+    const cell = this.cells[index];
+    cell.classList.remove(...Array.from(cell.classList).filter((o) => o.startsWith('selected')));
   }
 
   showCellTooltip(message, index) {
