@@ -3,8 +3,8 @@ export function randInt(max, min = 0) {
 }
 
 export function calcTileType(index, boardSize) {
-  let columnNumber = index % boardSize
-  let rowNumber = (index - columnNumber) / boardSize;
+  const columnNumber = index % boardSize;
+  const rowNumber = (index - columnNumber) / boardSize;
   let rowMode = '';
   let columnMode = '';
 
@@ -17,14 +17,14 @@ export function calcTileType(index, boardSize) {
   }
 
   if (rowMode && columnMode) {
-    rowMode += '-'
+    rowMode += '-';
   }
 
   return rowMode + columnMode || 'center';
 }
 
-export function getTooltipMsg({level, attack, defence, health} = character) {
-  return `🎖${level} ⚔${attack} 🛡${defence} ❤${health}`;
+export function getTooltipMsg(character) {
+  return `🎖${character.level} ⚔${character.attack} 🛡${character.defence} ❤${character.health}`;
 }
 
 export function calcHealthLevel(health) {

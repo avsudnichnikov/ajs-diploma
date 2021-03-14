@@ -1,16 +1,7 @@
-import {randInt} from "./utils";
-import Team from "./Nation/Team";
+import { randInt } from './utils';
 
-function generateCharacters(nation, characterCount, maxLevel){
-  const characters = [];
-  while (characters.length < characterCount) {
-    characters.push(nation.newChar(maxLevel));
-  }
-  return characters;
-}
-
-export function generatePositions(characters, side, boardSize) {
-  const leftSide = side === 'left';
+export function generatePositions(characters, startPos, boardSize) {
+  const leftSide = startPos === 'left';
   const positions = new Set();
 
   while (positions.size < characters.length) {
@@ -18,17 +9,5 @@ export function generatePositions(characters, side, boardSize) {
     const row = randInt(boardSize - 1);
     positions.add(col + row * boardSize);
   }
-
   return [...positions];
-}
-
-export function generateTeam(nation, characterCount, maxLevel, side, boardSize) {
-  const team = new Team(nation);
-
-  const characters = generateCharacters(team.nation, characterCount, maxLevel);
-  const positions = generatePositions(characters, side, boardSize)
-
-  team.addFew(characters, positions);
-
-  return team;
 }

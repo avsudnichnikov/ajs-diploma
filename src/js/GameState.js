@@ -1,6 +1,8 @@
 export default class GameState {
-  static from(object) {
-    // TODO: create object
-    return null;
+  constructor() {
+    this.players = [];
+    this.turn = 0;
+    this.level = 1;
+    this.score = null;
   }
 }

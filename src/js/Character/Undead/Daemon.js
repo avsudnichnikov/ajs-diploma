@@ -1,10 +1,10 @@
-import Character from "../Character";
+import Character from '../Character';
 
 export default class Daemon extends Character {
   constructor(level) {
     const attack = 10;
     const defence = 40;
     const range = 4;
-    super(level, 'Daemon', attack, defence, range);
+    super(level, 'daemon', attack, defence, range);
   }
 }

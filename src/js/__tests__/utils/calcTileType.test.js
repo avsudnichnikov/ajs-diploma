@@ -1,4 +1,4 @@
-import {calcTileType} from '../../utils';
+import { calcTileType } from '../../utils';
 
 test('top-left', () => {
   const expected = 'top-left';

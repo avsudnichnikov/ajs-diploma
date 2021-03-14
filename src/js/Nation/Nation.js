@@ -1,4 +1,4 @@
-import {randInt} from "../utils";
+import { randInt } from '../utils';
 
 export default class Nation {
   constructor(title, allowedTypes = []) {
@@ -8,11 +8,9 @@ export default class Nation {
 
   addType(classChar) {
     this.allowedTypes.push(classChar);
-  };
+  }
 
   newChar(maxLevel) {
-    const character = new this.allowedTypes[randInt(this.allowedTypes.length - 1)](randInt(maxLevel, 1));
-    character.nation = this.title;
-    return character;
+    return new this.allowedTypes[randInt(this.allowedTypes.length - 1)](randInt(maxLevel, 1));
   }
 }
