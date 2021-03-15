@@ -47,11 +47,33 @@ export default class GameController {
   onCellClick(index) {
     if (this.selectedPerson) {
       const action = this.getSelectedPersAllowableAction(index);
-      if (action === this.actions.change){
-        this.selectPerson(index);
+      if (action === this.actions.move) {
+        this.gamePlay.deselectCell(this.selectedPerson.position);
+        this.selectedPerson.position = index;
+        this.nextTurn();
       }
-      if (action === this.actions.nothing){
+      if (action === this.actions.attack) {
+        const attacker = this.selectedPerson;
+        let target = this.getPersByPos(index);
+        const attack = attacker.character.attack;
+        const defence = target.character.defence;
+        const damage = Math.max(attack - defence, attack * 0.1);
+        this.gamePlay.showDamage(index, damage)
+          .then(() => {
+            target.character.health -= damage;
+            this.gamePlay.deselectCell(this.hoverCell);
+            this.gamePlay.deselectCell(target.position);
+            if (target.character.health === 0) {
+              this.getTeamByPosition(target.position).deleteMember(target.position);
+            }
+            this.nextTurn();
+          });
+      }
+      if (action === this.actions.nothing) {
         this.deselect();
+      }
+      if (action === this.actions.change) {
+        this.selectPerson(index);
       }
     } else {
       this.selectPerson(index);
@@ -71,6 +93,15 @@ export default class GameController {
     this.gamePlay.hideCellTooltip(index);
   }
 
+  nextTurn() {
+    this.deselect();
+    this.gamePlay.redrawPositions(this.getPersons());
+    this.state.turn += 1;
+    if (this.state.turn >= this.state.players.length) {
+      this.state.turn = 0;
+    }
+  }
+
   getPersons(playerIndex, directSearch) {
     const player = (typeof (playerIndex) === 'number') ? playerIndex : -1;
     const direct = directSearch || (typeof (playerIndex) === 'number' && typeof (directSearch) !== 'boolean');
@@ -85,6 +116,12 @@ export default class GameController {
 
   getPersByPos(pos, player, direct) {
     return this.getPersons(player, direct).find((item) => item.position === pos) || null;
+  }
+
+  getTeamByPosition(pos) {
+    return this.state.players.find((player) =>
+      player.persons.find((person) => person.position === pos)
+    ).team;
   }
 
   getSelectedPersAllowableAction(index) {
@@ -119,12 +156,8 @@ export default class GameController {
     return !!this.getPersByPos(index, this.state.turn);
   }
 
-  getEnemyPers(index) {
-    return this.getPersByPos(index, this.state.turn, false);
-  }
-
   showTooltip(index) {
-    const person = this.getPersByPos(index);
+    const person = this.getPersByPos(index, this.state.turn, false);
     if (person) {
       this.gamePlay.showCellTooltip(getTooltipMsg(person.character), index);
     }
@@ -158,7 +191,7 @@ export default class GameController {
     }
   }
 
-  selectPerson(index){
+  selectPerson(index) {
     const person = this.getPersByPos(index, this.state.turn);
     this.deselect();
     if (person) {
@@ -170,7 +203,7 @@ export default class GameController {
   deselect() {
     if (this.selectedPerson) {
       this.gamePlay.deselectCell(this.selectedPerson.position);
-      this.selectedPerson = undefined;
     }
+    this.selectedPerson = undefined;
   }
 }

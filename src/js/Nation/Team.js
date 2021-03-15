@@ -42,12 +42,20 @@ export default class Team {
     return this.persons.find((item) => item.position === position) || null;
   }
 
+  findIndexByPos(position) {
+    return this.persons.findIndex((item) => item.position === position) || null;
+  }
+
   replaceMembers(startPos, boardSize) {
     const positions = generatePositions(this.persons, startPos, boardSize);
 
     this.persons.forEach((person, index) => {
       person.position = positions[index];
     });
+  }
+
+  deleteMember(position){
+    this.persons.splice(this.findIndexByPos(position), 1);
   }
 
   #generateCharacters(characterCount, maxLevel) {
