@@ -5,7 +5,7 @@ export default class Character {
     this.attack = attack;
     this.defence = defence;
     this.step = step;
-    this.health = 50;
+    this.health = 100;
 
     if (new.target.name === 'Character') {
       throw new Error('Character is not available for creating instances');
@@ -19,5 +19,17 @@ export default class Character {
 
   levelUp() {
     this.level += 1;
+    this.attack = Math.max(this.attack, this.attack * (1.8 - this.health) / 100);
+    this.health += 80;
+  }
+
+  get health() {
+    return this._health;
+  }
+
+  set health(value) {
+    this._health = value;
+    if (this._health < 0) this._health = 0;
+    if (this._health > 100) this._health = 100;
   }
 }
