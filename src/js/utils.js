@@ -1,4 +1,4 @@
-import DCoords from "./DCoords";
+import DCoords from './DCoords';
 
 export function randInt(max, min = 0) {
   return Math.floor(min + Math.random() * (max + 1 - min));

@@ -1,4 +1,4 @@
-import Team from '../Nation/Team';
+import Team from './Team';
 
 export default class Player {
   constructor(nation, startPos, ai = false, team = null) {

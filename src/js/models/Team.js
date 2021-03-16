@@ -1,6 +1,6 @@
 import PositionedCharacter from '../PositionedCharacter';
-import {generatePositions} from "../generators";
-import {randInt} from "../utils";
+import { generatePositions } from '../generators';
+import { randInt } from '../utils';
 
 export default class Team {
   constructor(nation, startPos, player) {
@@ -34,8 +34,12 @@ export default class Team {
     });
   }
 
-  generate({characterCount, maxLevel, boardSize} = generateOptons) {
-    const characters = this.#generateCharacters(characterCount, maxLevel);
+  generate(generateOptons) {
+    const { characterCount, maxLevel, boardSize } = generateOptons;
+    const characters = [];
+    while (characters.length < characterCount) {
+      characters.push(this.nation.newChar(maxLevel));
+    }
     this.addFew(characters, boardSize);
   }
 
@@ -47,27 +51,18 @@ export default class Team {
     return this.persons.findIndex((item) => item.position === position) || null;
   }
 
-  rand(){
+  rand() {
     return this.persons[randInt(this.length - 1)];
   }
 
   replaceMembers(startPos, boardSize) {
     const positions = generatePositions(this.persons, startPos, boardSize);
-
     this.persons.forEach((person, index) => {
       person.position = positions[index];
     });
   }
 
-  deleteMember(position){
+  deleteMember(position) {
     this.persons.splice(this.findIndexByPos(position), 1);
-  }
-
-  #generateCharacters(characterCount, maxLevel) {
-    const characters = [];
-    while (characters.length < characterCount) {
-      characters.push(this.nation.newChar(maxLevel));
-    }
-    return characters;
   }
 }

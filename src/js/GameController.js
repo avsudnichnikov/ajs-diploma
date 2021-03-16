@@ -1,8 +1,8 @@
 import themes from './themes';
-import {nations} from './Nation/nations';
-import {getTooltipMsg, randInt} from './utils';
-import Player from './Player/Player';
-import cursors from "./cursors";
+import { nations } from './nations';
+import { getTooltipMsg, randInt } from './utils';
+import Player from './models/Player';
+import cursors from './cursors';
 
 export default class GameController {
   constructor(gamePlay, stateService) {
@@ -81,7 +81,7 @@ export default class GameController {
     if (this.selectedPerson) {
       this.setCell(index, this.getSelectedPersAllowableAction(index));
     } else {
-      this.gamePlay.setCursor(cursors.auto)
+      this.gamePlay.setCursor(cursors.auto);
     }
     this.showTooltip(index);
   }
@@ -126,13 +126,13 @@ export default class GameController {
     if (this.state.players[this.state.turn].ai) {
       setTimeout(
         this.aiTurn.bind(this),
-        300
+        300,
       );
     }
   }
 
   aiTurn() {
-    const team = this.state.players[this.state.turn].team;
+    const { team } = this.state.players[this.state.turn];
     const enemyPersons = this.getPersons(this.state.turn, false);
     let attack;
     team.persons.forEach((person) => {
@@ -140,16 +140,16 @@ export default class GameController {
       const targets = [...enemyPersons.filter((item) => cells.includes(item.position))];
       targets.forEach((target) => {
         const damage = person.damage(target);
-        if (!attack || attack.damage < damage ||
-          attack.target.character.health > target.character.health) {
+        if (!attack || attack.damage < damage
+          || attack.target.character.health > target.character.health) {
           attack = {
             person,
             target,
-            damage
-          }
+            damage,
+          };
         }
-      })
-    })
+      });
+    });
     if (attack) {
       this.selectedPerson = attack.person;
       this.attackSelectedPers(attack.target.position);
@@ -182,9 +182,7 @@ export default class GameController {
   }
 
   getTeamByPosition(pos) {
-    return this.state.players.find((player) =>
-      player.persons.find((person) => person.position === pos)
-    ).team;
+    return this.state.players.find((player) => player.persons.find((person) => person.position === pos)).team;
   }
 
   getSelectedPersAllowableAction(index) {
@@ -260,19 +258,19 @@ export default class GameController {
   setCell(index, type) {
     if (type === this.actions.self) {
       this.gamePlay.setCursor(cursors.pointer);
-      this.hoverCell = {index, color: 'yellow'};
+      this.hoverCell = { index, color: 'yellow' };
     }
     if (type === this.actions.attack) {
       this.gamePlay.setCursor(cursors.crosshair);
-      this.hoverCell = {index, color: 'red'};
+      this.hoverCell = { index, color: 'red' };
     }
     if (type === this.actions.move) {
       this.gamePlay.setCursor(cursors.pointer);
-      this.hoverCell = {index, color: 'green'};
+      this.hoverCell = { index, color: 'green' };
     }
     if (type === this.actions.change) {
       this.gamePlay.setCursor(cursors.pointer);
-      this.hoverCell = {index, color: 'yellow'};
+      this.hoverCell = { index, color: 'yellow' };
     }
     if (type === this.actions.nothing) {
       this.gamePlay.setCursor(cursors.notallowed);
