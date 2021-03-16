@@ -54,8 +54,8 @@ export default class GameController {
     this.gamePlay.addCellClickListener(this.onCellClick.bind(this));
 
     this.gamePlay.addNewGameListener(this.newGame.bind(this));
-    this.gamePlay.addNewGameListener(this.loadGame.bind(this));
-    this.gamePlay.addNewGameListener(this.saveGame.bind(this));
+    this.gamePlay.addLoadGameListener(this.loadGame.bind(this));
+    this.gamePlay.addSaveGameListener(this.saveGame.bind(this));
   }
 
   onCellClick(index) {
