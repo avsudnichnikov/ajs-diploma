@@ -3,6 +3,6 @@ export default class GameState {
     this.players = [];
     this.turn = 0;
     this.level = 1;
-    this.score = null;
+    this.score = 0;
   }
 }

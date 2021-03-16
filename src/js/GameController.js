@@ -20,27 +20,13 @@ export default class GameController {
   }
 
   init() {
-    const generateOptions = {
-      characterCount: 2,
-      maxLevel: 1,
-      boardSize: this.gamePlay.boardSize,
-    };
-
-    const humanPlayer = new Player(nations.humans, 'left', false);
-    const aiPlayer = new Player(nations.undead, 'right', true);
-
-    humanPlayer.team.generate(generateOptions);
-    aiPlayer.team.generate(generateOptions);
-
-    this.state.players.push(humanPlayer);
-    this.state.players.push(aiPlayer);
-
-    this.gamePlay.drawUi(themes.prairie);
-    this.gamePlay.redrawPositions(this.getPersons());
+    this.newGame();
 
     this.gamePlay.addCellEnterListener(this.onCellEnter.bind(this));
     this.gamePlay.addCellLeaveListener(this.onCellLeave.bind(this));
     this.gamePlay.addCellClickListener(this.onCellClick.bind(this));
+
+    this.gamePlay.addNewGameListener(this.newGame.bind(this));
   }
 
   onCellClick(index) {
@@ -77,6 +63,30 @@ export default class GameController {
     this.gamePlay.hideCellTooltip(index);
   }
 
+  newGame() {
+    const generateOptions = {
+      characterCount: 2,
+      maxLevel: 1,
+      boardSize: this.gamePlay.boardSize,
+    };
+
+    const humanPlayer = new Player(nations.humans, 'left', false);
+    const aiPlayer = new Player(nations.undead, 'right', true);
+
+    humanPlayer.team.generate(generateOptions);
+    aiPlayer.team.generate(generateOptions);
+
+    this.state.players = [];
+    this.turn = 0;
+    this.level = 1;
+
+    this.state.players.push(humanPlayer);
+    this.state.players.push(aiPlayer);
+
+    this.gamePlay.drawUi(themes.prairie);
+    this.gamePlay.redrawPositions(this.getPersons());
+  }
+
   nextTurn() {
     this.deselect();
     this.gamePlay.redrawPositions(this.getPersons());
@@ -98,7 +108,7 @@ export default class GameController {
       const targets = [...enemyPersons.filter((item) => attackedCells.includes(item.position))];
       targets.forEach((target) => {
         const damage = person.damage(target);
-        if (!attacked || attacked.damage < damage) {
+        if (!attacked || attacked.damage < damage || attacked.target.character.health > target.character.health) {
           attacked = {
             person,
             target,
