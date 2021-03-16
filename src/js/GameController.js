@@ -36,7 +36,6 @@ export default class GameController {
     this.state.players.push(aiPlayer);
 
     this.gamePlay.drawUi(themes.prairie);
-
     this.gamePlay.redrawPositions(this.getPersons());
 
     this.gamePlay.addCellEnterListener(this.onCellEnter.bind(this));

@@ -16,13 +16,17 @@ export default class DCoords {
   static getArea(position, dist, boardSize) {
     const positions = [];
     const coordsPers = this.posToCoords(position, boardSize);
-    const minX = Math.max(coordsPers.x - dist, 0);
-    const maxX = Math.min(coordsPers.x + dist, boardSize - 1);
-    const minY = Math.max(coordsPers.y - dist, 0);
-    const maxY = Math.min(coordsPers.y + dist, boardSize - 1);
-    for (let col = minX; col <= maxX; col += 1) {
-      for (let row = minY; row <= maxY; row += 1) {
-        const coordsItem = {x: col, y: row};
+    const min = {
+      x: Math.max(coordsPers.x - dist, 0),
+      y: Math.max(coordsPers.y - dist, 0)
+    };
+    const max = {
+      x: Math.min(coordsPers.x + dist, boardSize - 1),
+      y: Math.min(coordsPers.y + dist, boardSize - 1)
+    };
+    for (let x = min.x; x <= max.x; x += 1) {
+      for (let y = min.y; y <= max.y; y += 1) {
+        const coordsItem = {x, y};
         const distance = this.distance(coordsItem, coordsPers);
         if ((distance <= dist) && (distance > 0)) {
           positions.push(this.coordsToPos(coordsItem, boardSize));
