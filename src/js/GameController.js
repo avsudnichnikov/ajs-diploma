@@ -54,6 +54,8 @@ export default class GameController {
     this.gamePlay.addCellClickListener(this.onCellClick.bind(this));
 
     this.gamePlay.addNewGameListener(this.newGame.bind(this));
+    this.gamePlay.addNewGameListener(this.loadGame.bind(this));
+    this.gamePlay.addNewGameListener(this.saveGame.bind(this));
   }
 
   onCellClick(index) {
@@ -92,7 +94,7 @@ export default class GameController {
 
   newGame() {
     const generateOptions = {
-      characterCount: 16,
+      characterCount: 4,
       maxLevel: 1,
       boardSize: this.gamePlay.boardSize,
     };
@@ -114,6 +116,14 @@ export default class GameController {
     this.gamePlay.redrawPositions(this.getPersons());
 
     this.nextTurn();
+  }
+
+  loadGame(){
+    this.stateService.load();
+  }
+
+  saveGame(){
+    this.stateService.save();
   }
 
   nextTurn() {
