@@ -9,7 +9,6 @@ export default class GameController {
     this.gamePlay = gamePlay;
     this.stateService = stateService;
     this.state = this.stateService.gameState;
-    this.hoverCell = -1;
     this.actions = {
       attack: 'attack',
       move: 'move',
@@ -17,6 +16,34 @@ export default class GameController {
       self: 'self',
       nothing: null,
     };
+  }
+
+  get selectedPerson() {
+    return this._selectedPerson;
+  }
+
+  set selectedPerson(value) {
+    if (typeof (value) === 'object') {
+      this.gamePlay.selectCell(value.position);
+    }
+    if (typeof (this._selectedPerson) === 'object') {
+      this.gamePlay.deselectCell(this._selectedPerson.position);
+    }
+    this._selectedPerson = value;
+  }
+
+  get hoverCell() {
+    return this._hoverCell;
+  }
+
+  set hoverCell(value) {
+    if (typeof (value) === 'object') {
+      this.gamePlay.selectCell(value.index, value.color);
+    }
+    if (typeof (this._hoverCell) === 'object') {
+      this.gamePlay.deselectCell(this._hoverCell.index);
+    }
+    this._hoverCell = value;
   }
 
   init() {
@@ -42,7 +69,7 @@ export default class GameController {
           this.selectPerson(index);
           break;
         default:
-          this.deselect();
+          this.selectedPerson = undefined;
           break;
       }
     } else {
@@ -65,19 +92,19 @@ export default class GameController {
 
   newGame() {
     const generateOptions = {
-      characterCount: 2,
+      characterCount: 16,
       maxLevel: 1,
       boardSize: this.gamePlay.boardSize,
     };
 
-    const humanPlayer = new Player(nations.humans, 'left', false);
+    const humanPlayer = new Player(nations.humans, 'left', true);
     const aiPlayer = new Player(nations.undead, 'right', true);
 
     humanPlayer.team.generate(generateOptions);
     aiPlayer.team.generate(generateOptions);
 
     this.state.players = [];
-    this.turn = 0;
+    this.turn = -1;
     this.level = 1;
 
     this.state.players.push(humanPlayer);
@@ -85,31 +112,37 @@ export default class GameController {
 
     this.gamePlay.drawUi(themes.prairie);
     this.gamePlay.redrawPositions(this.getPersons());
+
+    this.nextTurn();
   }
 
   nextTurn() {
-    this.deselect();
+    this.selectedPerson = undefined;
     this.gamePlay.redrawPositions(this.getPersons());
     this.state.turn += 1;
     if (this.state.turn >= this.state.players.length) {
       this.state.turn = 0;
     }
     if (this.state.players[this.state.turn].ai) {
-      this.aiTurn();
+      setTimeout(
+        this.aiTurn.bind(this),
+        300
+      );
     }
   }
 
   aiTurn() {
     const team = this.state.players[this.state.turn].team;
     const enemyPersons = this.getPersons(this.state.turn, false);
-    let attacked;
+    let attack;
     team.persons.forEach((person) => {
-      const attackedCells = person.getAttackCells(this.gamePlay.boardSize);
-      const targets = [...enemyPersons.filter((item) => attackedCells.includes(item.position))];
+      const cells = person.getAttackCells(this.gamePlay.boardSize);
+      const targets = [...enemyPersons.filter((item) => cells.includes(item.position))];
       targets.forEach((target) => {
         const damage = person.damage(target);
-        if (!attacked || attacked.damage < damage || attacked.target.character.health > target.character.health) {
-          attacked = {
+        if (!attack || attack.damage < damage ||
+          attack.target.character.health > target.character.health) {
+          attack = {
             person,
             target,
             damage
@@ -117,14 +150,16 @@ export default class GameController {
         }
       })
     })
-    if (attacked) {
-      this.selectedPerson = attacked.person;
-      this.attackSelectedPers(attacked.target.position);
+    if (attack) {
+      this.selectedPerson = attack.person;
+      this.attackSelectedPers(attack.target.position);
     } else {
       let allowedCells = [];
       while (allowedCells.length === 0) {
         this.selectedPerson = team.rand();
-        allowedCells = this.selectedPerson.getMoveCells(this.gamePlay.boardSize);
+        const persons = this.getPersons().map((item) => item.position);
+        const cells = this.selectedPerson.getMoveCells(this.gamePlay.boardSize);
+        allowedCells = cells.filter((item) => !persons.includes(item));
       }
       this.moveSelectedPers(allowedCells[randInt(allowedCells.length - 1)]);
     }
@@ -153,17 +188,19 @@ export default class GameController {
   }
 
   getSelectedPersAllowableAction(index) {
-    if (this.selectedPerson.position === index) {
-      return this.actions.self;
-    }
-    if (this.canSelectedPersMove(index)) {
-      return this.actions.move;
-    }
-    if (this.canSelectedPersAttack(index)) {
-      return this.actions.attack;
-    }
-    if (this.canSelectedPersChange(index)) {
-      return this.actions.change;
+    if (!this.state.players[this.state.turn].ai) {
+      if (this.selectedPerson.position === index) {
+        return this.actions.self;
+      }
+      if (this.canSelectedPersMove(index)) {
+        return this.actions.move;
+      }
+      if (this.canSelectedPersAttack(index)) {
+        return this.actions.attack;
+      }
+      if (this.canSelectedPersChange(index)) {
+        return this.actions.change;
+      }
     }
     return this.actions.nothing;
   }
@@ -185,19 +222,11 @@ export default class GameController {
   }
 
   selectPerson(index) {
+    this.selectedPerson = undefined;
     const person = this.getPersByPos(index, this.state.turn);
-    this.deselect();
     if (person) {
       this.selectedPerson = person;
-      this.gamePlay.selectCell(index);
     }
-  }
-
-  deselect() {
-    if (this.selectedPerson) {
-      this.gamePlay.deselectCell(this.selectedPerson.position);
-    }
-    this.selectedPerson = undefined;
   }
 
   moveSelectedPers(index) {
@@ -212,7 +241,7 @@ export default class GameController {
     this.gamePlay.showDamage(index, damage)
       .then(() => {
         target.character.health -= damage;
-        this.gamePlay.deselectCell(this.hoverCell);
+        this.hoverCell = undefined;
         this.gamePlay.deselectCell(target.position);
         if (target.character.health === 0) {
           this.getTeamByPosition(target.position).deleteMember(target.position);
@@ -229,30 +258,24 @@ export default class GameController {
   }
 
   setCell(index, type) {
-    if (this.hoverCell >= 0 && this.hoverCell !== this.selectedPerson.position) {
-      this.gamePlay.deselectCell(this.hoverCell);
-    }
     if (type === this.actions.self) {
       this.gamePlay.setCursor(cursors.pointer);
-      this.hoverCell = index;
+      this.hoverCell = {index, color: 'yellow'};
     }
     if (type === this.actions.attack) {
-      this.gamePlay.selectCell(index, 'red');
       this.gamePlay.setCursor(cursors.crosshair);
-      this.hoverCell = index;
+      this.hoverCell = {index, color: 'red'};
     }
     if (type === this.actions.move) {
-      this.gamePlay.selectCell(index, 'green');
       this.gamePlay.setCursor(cursors.pointer);
-      this.hoverCell = index;
+      this.hoverCell = {index, color: 'green'};
     }
     if (type === this.actions.change) {
       this.gamePlay.setCursor(cursors.pointer);
-      this.hoverCell = index;
+      this.hoverCell = {index, color: 'yellow'};
     }
     if (type === this.actions.nothing) {
       this.gamePlay.setCursor(cursors.notallowed);
-      this.hoverCell = index;
     }
   }
 }

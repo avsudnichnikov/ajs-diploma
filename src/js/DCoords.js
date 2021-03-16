@@ -27,8 +27,7 @@ export default class DCoords {
     for (let x = min.x; x <= max.x; x += 1) {
       for (let y = min.y; y <= max.y; y += 1) {
         const coordsItem = {x, y};
-        const distance = this.distance(coordsItem, coordsPers);
-        if ((distance <= dist) && (distance > 0)) {
+        if (this.distance(coordsItem, coordsPers) <= dist) {
           positions.push(this.coordsToPos(coordsItem, boardSize));
         }
       }
