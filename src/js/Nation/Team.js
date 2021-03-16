@@ -1,5 +1,6 @@
 import PositionedCharacter from '../PositionedCharacter';
 import {generatePositions} from "../generators";
+import {randInt} from "../utils";
 
 export default class Team {
   constructor(nation, startPos, player) {
@@ -44,6 +45,10 @@ export default class Team {
 
   findIndexByPos(position) {
     return this.persons.findIndex((item) => item.position === position) || null;
+  }
+
+  rand(){
+    return this.persons[randInt(this.length - 1)];
   }
 
   replaceMembers(startPos, boardSize) {

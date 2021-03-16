@@ -19,7 +19,11 @@ export default class Character {
 
   levelUp() {
     this.level += 1;
-    this.attack = Math.max(this.attack, this.attack * (1.8 - this.health) / 100);
+
+    const mod = (this.health > 30) ? (0.80 + this.health) / 100 : 1;
+    this.attack = Math.round(this.attack * mod);
+    this.defence = Math.round(this.defence * mod);
+
     this.health += 80;
   }
 

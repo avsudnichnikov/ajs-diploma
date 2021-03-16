@@ -1,23 +1,11 @@
+import DCoords from "./DCoords";
+
 export function randInt(max, min = 0) {
   return Math.floor(min + Math.random() * (max + 1 - min));
 }
 
-export function coordsToIndex(coords, boardSize) {
-  return coords.x + coords.y * boardSize
-}
-
-export function indexToCoords(index, boardSize) {
-  const x = index % boardSize;
-  const y = (index - x) / boardSize;
-  return {x, y}
-}
-
-export function distance(coordsA, coordsB) {
-  return Math.round(Math.max(Math.abs(coordsA.x - coordsB.x), Math.abs(coordsA.y - coordsB.y)))
-}
-
 export function calcTileType(index, boardSize) {
-  const coords = indexToCoords(index, boardSize);
+  const coords = DCoords.posToCoords(index, boardSize);
   let rowMode = '';
   let columnMode = '';
 

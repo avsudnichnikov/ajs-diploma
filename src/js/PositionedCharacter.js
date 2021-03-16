@@ -1,5 +1,5 @@
 import Character from './Character/Character';
-import {distance, indexToCoords} from "./utils";
+import DCoords from "./DCoords";
 
 export default class PositionedCharacter {
   constructor(character, position) {
@@ -15,17 +15,29 @@ export default class PositionedCharacter {
     this.position = position;
   }
 
-  #isActionCell(cell, boardSize, dist){
-    const coordsCell = indexToCoords(cell, boardSize);
-    const coordsPers = indexToCoords(this.position, boardSize);
-    return distance(coordsCell, coordsPers) <= dist;
+  damage(target){
+    return Math.max(this.character.attack - target.character.defence, this.character.attack * 0.1);
   }
 
-  isAttackCell(cell, boardSize){
+  #isActionCell(cell, boardSize, dist) {
+    const coordsCell = DCoords.posToCoords(cell, boardSize);
+    const coordsPers = DCoords.posToCoords(this.position, boardSize);
+    return DCoords.distance(coordsCell, coordsPers) <= dist;
+  }
+
+  isAttackCell(cell, boardSize) {
     return this.#isActionCell(cell, boardSize, this.character.range);
   }
 
-  isMoveCell(cell, boardSize){
+  isMoveCell(cell, boardSize) {
     return this.#isActionCell(cell, boardSize, this.character.step);
+  }
+
+  getAttackCells(boardSize) {
+    return DCoords.getArea(this.position, this.character.range, boardSize);
+  }
+
+  getMoveCells(boardSize) {
+    return DCoords.getArea(this.position, this.character.step, boardSize);
   }
 }
