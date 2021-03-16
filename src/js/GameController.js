@@ -99,7 +99,7 @@ export default class GameController {
       boardSize: this.gamePlay.boardSize,
     };
 
-    const humanPlayer = new Player(nations.humans, 'left', true);
+    const humanPlayer = new Player(nations.humans, 'left', false);
     const aiPlayer = new Player(nations.undead, 'right', true);
 
     humanPlayer.team.generate(generateOptions);
@@ -120,10 +120,12 @@ export default class GameController {
 
   loadGame(){
     this.stateService.load();
+    this.gamePlay.redrawPositions(this.getPersons());
   }
 
   saveGame(){
     this.stateService.save();
+    this.gamePlay.redrawPositions(this.getPersons());
   }
 
   nextTurn() {
