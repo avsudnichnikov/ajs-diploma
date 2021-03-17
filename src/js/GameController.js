@@ -1,5 +1,5 @@
-import Player from './models/Player';
-import { getTooltipMsg, randInt } from './utils';
+import Team from './models/Team';
+import {getTooltipMsg, randInt} from './utils';
 import themes from './themes';
 import cursors from './cursors';
 
@@ -100,14 +100,14 @@ export default class GameController {
 
     this.clearState();
 
-    const humanPlayer = new Player('humans', 'left', false);
-    const aiPlayer = new Player('undead', 'right', true);
+    const humanTeam = new Team('humans', 'left', false);
+    const aiTeam = new Team('undead', 'right', true);
 
-    humanPlayer.generateTeam(generateOptions);
-    aiPlayer.generateTeam(generateOptions);
+    humanTeam.generateMembers(generateOptions);
+    aiTeam.generateMembers(generateOptions);
 
-    this.state.players.push(humanPlayer);
-    this.state.players.push(aiPlayer);
+    this.state.teams.push(humanTeam);
+    this.state.teams.push(aiTeam);
 
     this.gamePlay.drawUi(themes.prairie);
     this.gamePlay.redrawPositions(this.getPersons());
@@ -116,7 +116,7 @@ export default class GameController {
   }
 
   clearState() {
-    this.state.players = [];
+    this.state.teams = [];
     this.state.turn = -1;
     this.state.level = 1;
   }
@@ -135,10 +135,10 @@ export default class GameController {
     this.selectedPerson = undefined;
     this.gamePlay.redrawPositions(this.getPersons());
     this.state.turn += 1;
-    if (this.state.turn >= this.state.players.length) {
+    if (this.state.turn >= this.state.teams.length) {
       this.state.turn = 0;
     }
-    if (this.state.players[this.state.turn].ai) {
+    if (this.state.teams[this.state.turn].ai) {
       setTimeout(
         this.aiTurn.bind(this),
         300,
@@ -147,10 +147,10 @@ export default class GameController {
   }
 
   aiTurn() {
-    const player = this.state.players[this.state.turn];
+    const team = this.state.teams[this.state.turn];
     const enemyPersons = this.getPersons(this.state.turn, false);
     let attack;
-    player.team.forEach((person) => {
+    for (let person of team) {
       const cells = person.getAttackCells(this.gamePlay.boardSize);
       const targets = [...enemyPersons.filter((item) => cells.includes(item.position))];
       targets.forEach((target) => {
@@ -164,14 +164,14 @@ export default class GameController {
           };
         }
       });
-    });
+    }
     if (attack) {
       this.selectedPerson = attack.person;
       this.attackSelectedPers(attack.target.position);
     } else {
       let allowedCells = [];
       while (allowedCells.length === 0) {
-        this.selectedPerson = player.randomMember();
+        this.selectedPerson = team.rand();
         const persons = this.getPersons().map((item) => item.position);
         const cells = this.selectedPerson.getMoveCells(this.gamePlay.boardSize);
         allowedCells = cells.filter((item) => !persons.includes(item));
@@ -180,31 +180,31 @@ export default class GameController {
     }
   }
 
-  getPersons(playerIndex, directSearch) {
-    const player = (typeof (playerIndex) === 'number') ? playerIndex : -1;
+  getPersons(teamIndex, directSearch) {
+    const team = (typeof (teamIndex) === 'number') ? teamIndex : -1;
     const direct = directSearch
-      || (typeof (playerIndex) === 'number' && typeof (directSearch) !== 'boolean');
+      || (typeof (teamIndex) === 'number' && typeof (directSearch) !== 'boolean');
     const persons = [];
-    this.state.players.forEach((current, index) => {
-      if ((direct && (index === player)) || (!direct && (index !== player))) {
-        persons.push(...current.team);
+    this.state.teams.forEach((current, index) => {
+      if ((direct && (index === team)) || (!direct && (index !== team))) {
+        persons.push(...current.persons);
       }
     });
     return persons;
   }
 
-  getPersByPosition(pos, player, direct) {
-    return this.getPersons(player, direct).find((item) => item.position === pos) || null;
+  getPersByPosition(pos, team, direct) {
+    return this.getPersons(team, direct).find((item) => item.position === pos) || null;
   }
 
-  getPlayerByPosition(pos) {
-    return this.state.players.find(
-      (player) => player.team.find((person) => person.position === pos),
+  getTeamByPosition(pos) {
+    return this.state.teams.find(
+      (team) => team.persons.find((person) => person.position === pos),
     );
   }
 
   getSelectedPersAllowableAction(index) {
-    if (!this.state.players[this.state.turn].ai) {
+    if (!this.state.teams[this.state.turn].ai) {
       if (this.selectedPerson.position === index) {
         return this.actions.self;
       }
@@ -260,7 +260,7 @@ export default class GameController {
         this.hoverCell = undefined;
         this.gamePlay.deselectCell(target.position);
         if (target.character.health <= 0) {
-          this.getPlayerByPosition(target.position).deleteMember(target.position);
+          this.getTeamByPosition(target.position).delete(target.position);
         }
         this.nextTurn();
       });
@@ -276,19 +276,19 @@ export default class GameController {
   setCell(index, type) {
     if (type === this.actions.self) {
       this.gamePlay.setCursor(cursors.pointer);
-      this.hoverCell = { index, color: 'yellow' };
+      this.hoverCell = {index, color: 'yellow'};
     }
     if (type === this.actions.attack) {
       this.gamePlay.setCursor(cursors.crosshair);
-      this.hoverCell = { index, color: 'red' };
+      this.hoverCell = {index, color: 'red'};
     }
     if (type === this.actions.move) {
       this.gamePlay.setCursor(cursors.pointer);
-      this.hoverCell = { index, color: 'green' };
+      this.hoverCell = {index, color: 'green'};
     }
     if (type === this.actions.change) {
       this.gamePlay.setCursor(cursors.pointer);
-      this.hoverCell = { index, color: 'yellow' };
+      this.hoverCell = {index, color: 'yellow'};
     }
     if (type === this.actions.nothing) {
       this.gamePlay.setCursor(cursors.notallowed);

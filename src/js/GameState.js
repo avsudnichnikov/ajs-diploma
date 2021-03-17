@@ -1,4 +1,4 @@
-import Player from './models/Player';
+import Team from './models/Team';
 import CharacterController from './CharacterController';
 import PositionedCharacter from './models/PositionedCharacter';
 
@@ -12,14 +12,14 @@ export default class GameState {
 
   static from(object) {
     const state = new GameState(object.turn, object.level, object.score);
-    state.players = object.players.map((rowPlayer) => {
-      const team = rowPlayer.team.map(
+    state.teams = object.teams.map((rowTeam) => {
+      const persons = rowTeam.persons.map(
         (member) => {
           const character = CharacterController.restoreChar(member.character);
           return new PositionedCharacter(character, member.position);
         },
       );
-      return new Player(rowPlayer.nation, rowPlayer.startPos, rowPlayer.ai, team);
+      return new Team(rowTeam.nation, rowTeam.startPos, rowTeam.ai, persons);
     });
 
     return state;
