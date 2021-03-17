@@ -25,12 +25,16 @@ export default class Person {
     return DCoords.distancePos(cell, this.position, boardSize, false);
   }
 
+  inLine(cell, boardSize) {
+    return DCoords.isOnLinePos(cell, this.position, boardSize);
+  }
+
   isAttackCell(cell, boardSize) {
     return this.distanceTo(cell, boardSize) <= this.character.range;
   }
 
   isMoveCell(cell, boardSize) {
-    return this.distanceTo(cell, boardSize) <= this.character.step;
+    return this.distanceTo(cell, boardSize) <= this.character.step && this.inLine(cell, boardSize);
   }
 
   getAttackCells(boardSize) {
@@ -38,6 +42,6 @@ export default class Person {
   }
 
   getMoveCells(boardSize) {
-    return DCoords.getArea(this.position, this.character.step, false, boardSize);
+    return DCoords.getLines(this.position, this.character.step, boardSize);
   }
 }

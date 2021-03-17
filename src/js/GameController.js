@@ -22,10 +22,10 @@ export default class GameController {
   }
 
   set selectedPerson(value) {
-    if (typeof (value) === 'object') {
+    if (typeof value === 'object') {
       this.gamePlay.selectCell(value.position);
     }
-    if (typeof (this._selectedPerson) === 'object') {
+    if (typeof this._selectedPerson === 'object') {
       this.gamePlay.deselectCell(this._selectedPerson.position);
     }
     this._selectedPerson = value;
@@ -36,10 +36,10 @@ export default class GameController {
   }
 
   set hoverCell(value) {
-    if (typeof (value) === 'object') {
+    if (typeof value === 'object') {
       this.gamePlay.selectCell(value.index, value.color);
     }
-    if (typeof (this._hoverCell) === 'object') {
+    if (typeof this._hoverCell === 'object') {
       this.gamePlay.deselectCell(this._hoverCell.index);
     }
     this._hoverCell = value;
@@ -100,7 +100,7 @@ export default class GameController {
 
     this.clearState();
 
-    const humanTeam = new Team('humans', 'left', false);
+    const humanTeam = new Team('humans', 'left', true);
     const aiTeam = new Team('undead', 'right', true);
 
     humanTeam.generateMembers(generateOptions);
@@ -119,6 +119,8 @@ export default class GameController {
     this.state.teams = [];
     this.state.turn = -1;
     this.state.level = 1;
+    this.hoverCell = undefined;
+    this.selectedPerson = undefined;
   }
 
   loadGame() {
