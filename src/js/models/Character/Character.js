@@ -1,6 +1,9 @@
+import { randInt } from '../../utils';
+
 export default class Character {
   constructor(baseAttr, level) {
     this.type = baseAttr.type;
+    this.grade = baseAttr.grade || 0;
     this.attack = baseAttr.attack || 0;
     this.defence = baseAttr.defence || 0;
     this.range = baseAttr.range || 0;
@@ -14,14 +17,18 @@ export default class Character {
 
     this.level = 1;
     while (this.level < level) {
-      this.levelUp();
+      this.levelUp(true);
     }
   }
 
-  levelUp() {
+  levelUp(emulate = false) {
     this.level += 1;
 
-    const mod = (this.health > 30) ? (0.80 + this.health) / 100 : 1;
+    if (emulate) {
+      this.health = randInt(100, 30);
+    }
+
+    const mod = (this.health > 30) ? (0.80 + this.health / 100) : 1;
     this.attack = Math.round(this.attack * mod);
     this.defence = Math.round(this.defence * mod);
 

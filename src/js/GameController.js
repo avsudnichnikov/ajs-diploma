@@ -36,13 +36,13 @@ export default class GameController {
   }
 
   set hoverCell(value) {
-      if (typeof this._hoverCell === 'object') {
-        this.gamePlay.deselectCell(this._hoverCell.index);
-      }
-      if (typeof value === 'object') {
-        this.gamePlay.selectCell(value.index, value.color);
-      }
-      this._hoverCell = value;
+    if (typeof this._hoverCell === 'object') {
+      this.gamePlay.deselectCell(this._hoverCell.index);
+    }
+    if (typeof value === 'object') {
+      this.gamePlay.selectCell(value.index, value.color);
+    }
+    this._hoverCell = value;
   }
 
   init() {
@@ -92,41 +92,37 @@ export default class GameController {
   }
 
   newGame() {
-    const generateOptions = {
+    this.state.clear();
+    this.selectedPerson = undefined;
+    this.hoverCell = undefined;
+    clearTimeout(this.aiTimer);
+
+    this.state.generateOptions = {
       characterCount: 3,
       maxLevel: 1,
       boardSize: this.gamePlay.boardSize,
     };
 
-    this.clearState();
+    this.state.teams[0] = new Team('humans', 'left', false);
+    this.state.teams[1] = new Team('undead', 'right', true);
 
-    const humanTeam = new Team('humans', 'left', true);
-    const aiTeam = new Team('undead', 'right', true);
+    this.state.teams[0].generateMembers(this.state.generateOptions, 1);
 
-    humanTeam.generateMembers(generateOptions);
-    aiTeam.generateMembers(generateOptions);
-
-    this.state.teams.push(humanTeam);
-    this.state.teams.push(aiTeam);
-
-    this.gamePlay.drawUi(themes.prairie);
-    this.gamePlay.redrawPositions(this.getPersons());
-
-    this.nextTurn();
-  }
-
-  clearState() {
-    this.state.teams = [];
-    this.state.turn = -1;
-    this.state.level = 1;
-    this.hoverCell = undefined;
-    this.selectedPerson = undefined;
+    this.nextLevel();
   }
 
   loadGame() {
+    clearTimeout(this.aiTimer);
     this.stateService.load();
     this.state = this.stateService.gameState;
+    this.gamePlay.drawUi(themes[this.state.level % themes.length]);
     this.gamePlay.redrawPositions(this.getPersons());
+    if (this.state.teams[this.state.turn].ai) {
+      this.aiTimer = setTimeout(
+        this.aiTurn.bind(this),
+        500,
+      );
+    }
   }
 
   saveGame() {
@@ -134,25 +130,61 @@ export default class GameController {
   }
 
   nextTurn() {
+    const activeTeams = this.state.teams.filter((team) => team.length > 0);
     this.selectedPerson = undefined;
-    this.gamePlay.redrawPositions(this.getPersons());
     this.state.turn += 1;
-    if (this.state.turn >= this.state.teams.length) {
-      this.state.turn = 0;
-    }
-    if (this.state.teams[this.state.turn].ai) {
-      setTimeout(
+    if (activeTeams.length === 1) {
+      this.endLevel();
+    } else if (this.state.teams[this.state.turn].ai) {
+      this.aiTimer = setTimeout(
         this.aiTurn.bind(this),
         300,
       );
     }
+    this.gamePlay.redrawPositions(this.getPersons());
+  }
+
+  endLevel() {
+    const playerTeam = this.state.teams[0];
+    if (playerTeam.length > 0) {
+      this.state.score += playerTeam.persons.reduce((acc, item) => acc + item.character.health, 0);
+      if (this.state.score > this.stateService.maxScore) {
+        this.stateService.maxScore = this.state.score;
+      }
+      for (const member of playerTeam) {
+        member.character.levelUp();
+      }
+
+      if (playerTeam.length < this.gamePlay.boardSize * 2) {
+        playerTeam.generateMembers({
+          characterCount: 1,
+          maxLevel: this.state.generateOptions.maxLevel,
+          boardSize: this.state.generateOptions.boardSize,
+        }, 2);
+      }
+
+      playerTeam.replace(this.gamePlay.boardSize);
+      this.nextLevel();
+    }
+  }
+
+  nextLevel() {
+    this.state.level += 1;
+
+    this.state.generateOptions.characterCount = this.state.teams[0].length;
+    this.state.generateOptions.maxLevel = this.state.level + 1;
+    this.state.teams[1].generateMembers(this.state.generateOptions);
+
+    this.gamePlay.drawUi(themes[this.state.level % themes.length]);
+    this.nextTurn();
   }
 
   aiTurn() {
     const team = this.state.teams[this.state.turn];
     const enemyPersons = this.getPersons(this.state.turn, false);
     let attack;
-    for (let person of team) {
+    let goAttack;
+    for (const person of team) {
       const cells = person.getAttackCells(this.gamePlay.boardSize);
       const targets = [...enemyPersons.filter((item) => cells.includes(item.position))];
       targets.forEach((target) => {

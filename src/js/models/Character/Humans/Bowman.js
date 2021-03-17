@@ -4,7 +4,7 @@ export default class Bowman extends Character {
   constructor(level) {
     const attr = {
       type: 'bowman',
-      minLevel: 1,
+      grade: 1,
       attack: 25,
       defence: 25,
       range: 2,

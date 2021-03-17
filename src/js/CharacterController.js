@@ -34,9 +34,16 @@ export default class CharacterController {
     )[0];
   }
 
-  static genChar(nation, maxLevel, minLevel = 1) {
+  static genChar(nation, maxLevel, minLevel, grade) {
     const types = this.getTypesByNation(nation);
-    return new types[randInt(types.length - 1)](randInt(maxLevel, minLevel));
+    let char;
+    while (!char) {
+      char = new types[randInt(types.length - 1)](randInt(maxLevel, minLevel));
+      if (char.grade > grade) {
+        char = undefined;
+      }
+    }
+    return char;
   }
 
   static restoreChar(data) {

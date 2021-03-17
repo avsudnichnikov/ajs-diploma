@@ -4,7 +4,7 @@ export default class Daemon extends Character {
   constructor(level) {
     const attr = {
       type: 'daemon',
-      minLevel: 1,
+      grade: 2,
       attack: 10,
       defence: 40,
       range: 4,

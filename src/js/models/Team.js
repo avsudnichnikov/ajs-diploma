@@ -35,20 +35,23 @@ export default class Team {
     });
   }
 
-  generateMembers(generateOptons) {
-    const { characterCount, maxLevel, boardSize } = generateOptons;
+  generateMembers(generateOptions, grade = false) {
+    const {
+      characterCount, maxLevel, minLevel = 1, boardSize,
+    } = generateOptions;
     const characters = [];
     while (characters.length < characterCount) {
-      characters.push(CharacterController.genChar(this.nation, maxLevel));
+      characters.push(CharacterController.genChar(
+        this.nation,
+        maxLevel,
+        minLevel,
+        (grade) || maxLevel,
+      ));
     }
     this.addFew(characters, boardSize);
   }
 
-  findMemberByPos(position) {
-    return this.persons.find((item) => item.position === position) || null;
-  }
-
-  findIndexByPos(position) {
+  #findIndexByPos(position) {
     return this.persons.findIndex((item) => item.position === position) || null;
   }
 
@@ -56,14 +59,14 @@ export default class Team {
     return this.persons[randInt(this.length - 1)];
   }
 
-  replace(startPos, boardSize) {
-    const positions = generatePositions(this.persons, startPos, boardSize);
+  replace(boardSize) {
+    const positions = generatePositions(this.persons, this.startPos, boardSize);
     this.persons.forEach((person, index) => {
       person.position = positions[index];
     });
   }
 
   delete(position) {
-    this.persons.splice(this.findIndexByPos(position), 1);
+    this.persons.splice(this.#findIndexByPos(position), 1);
   }
 }

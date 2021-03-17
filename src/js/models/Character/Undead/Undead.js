@@ -4,7 +4,7 @@ export default class Undead extends Character {
   constructor(level) {
     const attr = {
       type: 'undead',
-      minLevel: 1,
+      grade: 1,
       attack: 40,
       defence: 10,
       range: 1,

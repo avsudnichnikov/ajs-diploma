@@ -16,8 +16,8 @@ export default class Person {
   }
 
   damage(target) {
-    const attack = this.character.attack;
-    const defence = target.character.defence;
+    const { attack } = this.character;
+    const { defence } = target.character;
     return Math.round(Math.max(attack - defence, attack * 0.1));
   }
 
@@ -43,5 +43,15 @@ export default class Person {
 
   getMoveCells(boardSize) {
     return DCoords.getLines(this.position, this.character.step, boardSize);
+  }
+
+  getMoveToTargetCells(target, boardSize, moveCells = false) {
+    const personMoveCells = DCoords.getMoveCells(boardSize);
+    const targetMoveCells = (moveCells) || DCoords.getLines(
+      target.position,
+      this.character.range,
+      boardSize,
+    );
+    return personMoveCells.filter((item) => !targetMoveCells.includes(item));
   }
 }

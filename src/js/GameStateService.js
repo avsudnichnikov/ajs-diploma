@@ -6,6 +6,14 @@ export default class GameStateService {
     this.gameState = new GameState();
   }
 
+  get maxScore() {
+    return +this.storage.getItem('maxScore') || 0;
+  }
+
+  set maxScore(value) {
+    this.storage.setItem('maxScore', value);
+  }
+
   save() {
     this.storage.setItem('state', JSON.stringify(this.gameState));
   }
