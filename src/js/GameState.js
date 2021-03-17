@@ -1,4 +1,5 @@
 import Player from './models/Player';
+import CharacterController from './CharacterController';
 import PositionedCharacter from './models/PositionedCharacter';
 
 export default class GameState {
@@ -11,18 +12,15 @@ export default class GameState {
 
   static from(object) {
     const state = new GameState(object.turn, object.level, object.score);
-
-    console.log(object);
-
     state.players = object.players.map((rowPlayer) => {
-      rowPlayer.team.forEach((member) => console.log(member.position));
-      const team = rowPlayer.team.map((member) => new PositionedCharacter(member.character, member.position));
-      console.log(team);
-      const player = new Player(rowPlayer.nation, rowPlayer.startPos, rowPlayer.ai, team);
-      return player;
+      const team = rowPlayer.team.map(
+        (member) => {
+          const character = CharacterController.restoreChar(member.character);
+          return new PositionedCharacter(character, member.position);
+        },
+      );
+      return new Player(rowPlayer.nation, rowPlayer.startPos, rowPlayer.ai, team);
     });
-
-    console.log(state);
 
     return state;
   }

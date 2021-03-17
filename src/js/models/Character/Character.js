@@ -1,14 +1,12 @@
 export default class Character {
-  constructor(attr, level = 1) {
-    this.type = attr.type;
+  constructor(baseAttr, level) {
+    this.type = baseAttr.type;
+    this.attack = baseAttr.attack || 0;
+    this.defence = baseAttr.defence || 0;
+    this.range = baseAttr.range || 0;
+    this.step = baseAttr.step || 1;
 
-    this.attack = attr.attack || 0;
-    this.defence = attr.defence || 0;
-
-    this.range = attr.range || 0;
-    this.step = attr.step || 1;
-
-    this.health = 10;
+    this.health = 100;
 
     if (new.target.name === 'Character') {
       throw new Error('Character is not available for creating instances');
@@ -40,7 +38,10 @@ export default class Character {
     if (this._health > 100) this._health = 100;
   }
 
-  from(attr) {
+  setAttr(attr) {
+    if (typeof attr !== 'object') {
+      throw new Error('Argument attr can be object');
+    }
     for (const prop in attr) {
       if (Object.prototype.hasOwnProperty.call(attr, prop)) {
         this[prop] = attr[prop];

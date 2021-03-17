@@ -93,7 +93,7 @@ export default class GameController {
 
   newGame() {
     const generateOptions = {
-      characterCount: 4,
+      characterCount: 3,
       maxLevel: 1,
       boardSize: this.gamePlay.boardSize,
     };
@@ -182,7 +182,8 @@ export default class GameController {
 
   getPersons(playerIndex, directSearch) {
     const player = (typeof (playerIndex) === 'number') ? playerIndex : -1;
-    const direct = directSearch || (typeof (playerIndex) === 'number' && typeof (directSearch) !== 'boolean');
+    const direct = directSearch
+      || (typeof (playerIndex) === 'number' && typeof (directSearch) !== 'boolean');
     const persons = [];
     this.state.players.forEach((current, index) => {
       if ((direct && (index === player)) || (!direct && (index !== player))) {
@@ -192,12 +193,14 @@ export default class GameController {
     return persons;
   }
 
-  getPersByPos(pos, player, direct) {
+  getPersByPosition(pos, player, direct) {
     return this.getPersons(player, direct).find((item) => item.position === pos) || null;
   }
 
   getPlayerByPosition(pos) {
-    return this.state.players.find((player) => player.team.find((person) => person.position === pos));
+    return this.state.players.find(
+      (player) => player.team.find((person) => person.position === pos),
+    );
   }
 
   getSelectedPersAllowableAction(index) {
@@ -220,23 +223,23 @@ export default class GameController {
 
   canSelectedPersMove(index) {
     const canMoveCell = this.selectedPerson.isMoveCell(index, this.gamePlay.boardSize);
-    const isEmptyCell = !this.getPersByPos(index);
+    const isEmptyCell = !this.getPersByPosition(index);
     return canMoveCell && isEmptyCell;
   }
 
   canSelectedPersAttack(index) {
     const canAttackCell = this.selectedPerson.isAttackCell(index, this.gamePlay.boardSize);
-    const isEnemyCell = !!this.getPersByPos(index, this.state.turn, false);
+    const isEnemyCell = !!this.getPersByPosition(index, this.state.turn, false);
     return canAttackCell && isEnemyCell;
   }
 
   canSelectedPersChange(index) {
-    return !!this.getPersByPos(index, this.state.turn);
+    return !!this.getPersByPosition(index, this.state.turn);
   }
 
   selectPerson(index) {
     this.selectedPerson = undefined;
-    const person = this.getPersByPos(index, this.state.turn);
+    const person = this.getPersByPosition(index, this.state.turn);
     if (person) {
       this.selectedPerson = person;
     }
@@ -249,7 +252,7 @@ export default class GameController {
   }
 
   attackSelectedPers(index) {
-    const target = this.getPersByPos(index);
+    const target = this.getPersByPosition(index);
     const damage = this.selectedPerson.damage(target);
     this.gamePlay.showDamage(index, damage)
       .then(() => {
@@ -264,7 +267,7 @@ export default class GameController {
   }
 
   showTooltip(index) {
-    const person = this.getPersByPos(index);
+    const person = this.getPersByPosition(index);
     if (person) {
       this.gamePlay.showCellTooltip(getTooltipMsg(person.character), index);
     }

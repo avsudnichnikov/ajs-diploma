@@ -33,7 +33,7 @@ export default class Player {
     const { characterCount, maxLevel, boardSize } = generateOptons;
     const characters = [];
     while (characters.length < characterCount) {
-      characters.push(CharacterController.newChar(this.nation, maxLevel));
+      characters.push(CharacterController.genChar(this.nation, maxLevel));
     }
     this.addFewToTeam(characters, boardSize);
   }
