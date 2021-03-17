@@ -4,7 +4,7 @@ import Person from './models/Person';
 
 export default class GameState {
   constructor(turn = -1, level = 1, score = 0) {
-    this.players = [];
+    this.teams = [];
     this.turn = turn;
     this.level = level;
     this.score = score;

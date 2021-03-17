@@ -22,11 +22,11 @@ export default class GameController {
   }
 
   set selectedPerson(value) {
-    if (typeof value === 'object') {
-      this.gamePlay.selectCell(value.position);
-    }
     if (typeof this._selectedPerson === 'object') {
       this.gamePlay.deselectCell(this._selectedPerson.position);
+    }
+    if (typeof value === 'object') {
+      this.gamePlay.selectCell(value.position);
     }
     this._selectedPerson = value;
   }
@@ -36,13 +36,13 @@ export default class GameController {
   }
 
   set hoverCell(value) {
-    if (typeof value === 'object') {
-      this.gamePlay.selectCell(value.index, value.color);
-    }
-    if (typeof this._hoverCell === 'object') {
-      this.gamePlay.deselectCell(this._hoverCell.index);
-    }
-    this._hoverCell = value;
+      if (typeof this._hoverCell === 'object') {
+        this.gamePlay.deselectCell(this._hoverCell.index);
+      }
+      if (typeof value === 'object') {
+        this.gamePlay.selectCell(value.index, value.color);
+      }
+      this._hoverCell = value;
   }
 
   init() {

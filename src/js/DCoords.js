@@ -87,7 +87,7 @@ export default class DCoords {
         (vector) => this.shiftCoordsToVector(coordsCenter, vector, dist)
       )
       cells.forEach((cell) => {
-        if (cell.x >= 0 && cell.x < boardSize && cell.y >= 0 && cell.x < boardSize) {
+        if (cell.x >= 0 && cell.x < boardSize && cell.y >= 0 && cell.y < boardSize) {
           positions.push(this.coordsToPos(cell, boardSize));
         }
       })
