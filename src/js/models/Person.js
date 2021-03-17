@@ -16,7 +16,9 @@ export default class Person {
   }
 
   damage(target) {
-    return Math.max(this.character.attack - target.character.defence, this.character.attack * 0.1);
+    const attack = this.character.attack;
+    const defence = target.character.defence;
+    return Math.round(Math.max(attack - defence, attack * 0.1));
   }
 
   distanceTo(cell, boardSize) {

@@ -8,7 +8,7 @@ export default class Swordsman extends Character {
       attack: 40,
       defence: 10,
       range: 1,
-      step: 1,
+      step: 4,
     };
     super(attr, level);
   }

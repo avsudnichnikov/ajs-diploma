@@ -8,7 +8,7 @@ export default class Bowman extends Character {
       attack: 25,
       defence: 25,
       range: 2,
-      step: 1,
+      step: 2,
     };
     super(attr, level);
   }

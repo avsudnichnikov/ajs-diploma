@@ -1,5 +1,5 @@
 import Team from './models/Team';
-import {getTooltipMsg, randInt} from './utils';
+import { getTooltipMsg, randInt } from './utils';
 import themes from './themes';
 import cursors from './cursors';
 
@@ -238,7 +238,6 @@ export default class GameController {
   }
 
   selectPerson(index) {
-    this.selectedPerson = undefined;
     const person = this.getPersByPosition(index, this.state.turn);
     if (person) {
       this.selectedPerson = person;
@@ -276,22 +275,23 @@ export default class GameController {
   setCell(index, type) {
     if (type === this.actions.self) {
       this.gamePlay.setCursor(cursors.pointer);
-      this.hoverCell = {index, color: 'yellow'};
+      this.hoverCell = undefined;
     }
     if (type === this.actions.attack) {
       this.gamePlay.setCursor(cursors.crosshair);
-      this.hoverCell = {index, color: 'red'};
+      this.hoverCell = { index, color: 'red' };
     }
     if (type === this.actions.move) {
       this.gamePlay.setCursor(cursors.pointer);
-      this.hoverCell = {index, color: 'green'};
+      this.hoverCell = { index, color: 'green' };
     }
     if (type === this.actions.change) {
       this.gamePlay.setCursor(cursors.pointer);
-      this.hoverCell = {index, color: 'yellow'};
+      this.hoverCell = undefined;
     }
     if (type === this.actions.nothing) {
       this.gamePlay.setCursor(cursors.notallowed);
+      this.hoverCell = undefined;
     }
   }
 }
