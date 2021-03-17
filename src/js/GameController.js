@@ -1,7 +1,6 @@
-import themes from './themes';
-import { nations } from './nations';
-import { getTooltipMsg, randInt } from './utils';
 import Player from './models/Player';
+import { getTooltipMsg, randInt } from './utils';
+import themes from './themes';
 import cursors from './cursors';
 
 export default class GameController {
@@ -99,15 +98,13 @@ export default class GameController {
       boardSize: this.gamePlay.boardSize,
     };
 
-    const humanPlayer = new Player(nations.humans, 'left', false);
-    const aiPlayer = new Player(nations.undead, 'right', true);
+    this.clearState();
 
-    humanPlayer.team.generate(generateOptions);
-    aiPlayer.team.generate(generateOptions);
+    const humanPlayer = new Player('humans', 'left', false);
+    const aiPlayer = new Player('undead', 'right', true);
 
-    this.state.players = [];
-    this.turn = -1;
-    this.level = 1;
+    humanPlayer.generateTeam(generateOptions);
+    aiPlayer.generateTeam(generateOptions);
 
     this.state.players.push(humanPlayer);
     this.state.players.push(aiPlayer);
@@ -118,14 +115,20 @@ export default class GameController {
     this.nextTurn();
   }
 
-  loadGame(){
+  clearState() {
+    this.state.players = [];
+    this.state.turn = -1;
+    this.state.level = 1;
+  }
+
+  loadGame() {
     this.stateService.load();
+    this.state = this.stateService.gameState;
     this.gamePlay.redrawPositions(this.getPersons());
   }
 
-  saveGame(){
+  saveGame() {
     this.stateService.save();
-    this.gamePlay.redrawPositions(this.getPersons());
   }
 
   nextTurn() {
@@ -144,10 +147,10 @@ export default class GameController {
   }
 
   aiTurn() {
-    const { team } = this.state.players[this.state.turn];
+    const player = this.state.players[this.state.turn];
     const enemyPersons = this.getPersons(this.state.turn, false);
     let attack;
-    team.persons.forEach((person) => {
+    player.team.forEach((person) => {
       const cells = person.getAttackCells(this.gamePlay.boardSize);
       const targets = [...enemyPersons.filter((item) => cells.includes(item.position))];
       targets.forEach((target) => {
@@ -168,7 +171,7 @@ export default class GameController {
     } else {
       let allowedCells = [];
       while (allowedCells.length === 0) {
-        this.selectedPerson = team.rand();
+        this.selectedPerson = player.randomMember();
         const persons = this.getPersons().map((item) => item.position);
         const cells = this.selectedPerson.getMoveCells(this.gamePlay.boardSize);
         allowedCells = cells.filter((item) => !persons.includes(item));
@@ -183,7 +186,7 @@ export default class GameController {
     const persons = [];
     this.state.players.forEach((current, index) => {
       if ((direct && (index === player)) || (!direct && (index !== player))) {
-        persons.push(...current.persons);
+        persons.push(...current.team);
       }
     });
     return persons;
@@ -193,8 +196,8 @@ export default class GameController {
     return this.getPersons(player, direct).find((item) => item.position === pos) || null;
   }
 
-  getTeamByPosition(pos) {
-    return this.state.players.find((player) => player.persons.find((person) => person.position === pos)).team;
+  getPlayerByPosition(pos) {
+    return this.state.players.find((player) => player.team.find((person) => person.position === pos));
   }
 
   getSelectedPersAllowableAction(index) {
@@ -253,8 +256,8 @@ export default class GameController {
         target.character.health -= damage;
         this.hoverCell = undefined;
         this.gamePlay.deselectCell(target.position);
-        if (target.character.health === 0) {
-          this.getTeamByPosition(target.position).deleteMember(target.position);
+        if (target.character.health <= 0) {
+          this.getPlayerByPosition(target.position).deleteMember(target.position);
         }
         this.nextTurn();
       });

@@ -1,5 +1,5 @@
-import Character from './models/Character/Character';
-import DCoords from './DCoords';
+import Character from './Character/Character';
+import DCoords from '../DCoords';
 
 export default class PositionedCharacter {
   constructor(character, position) {

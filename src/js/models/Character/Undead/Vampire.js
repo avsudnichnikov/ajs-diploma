@@ -2,9 +2,14 @@ import Character from '../Character';
 
 export default class Vampire extends Character {
   constructor(level) {
-    const attack = 25;
-    const defence = 25;
-    const range = 2;
-    super(level, 'vampire', attack, defence, range);
+    const attr = {
+      type: 'vampire',
+      minLevel: 1,
+      attack: 25,
+      defence: 25,
+      range: 2,
+      step: 1,
+    };
+    super(attr, level);
   }
 }
