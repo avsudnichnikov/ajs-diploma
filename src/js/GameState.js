@@ -1,6 +1,6 @@
 import Team from './models/Team';
 import CharacterController from './CharacterController';
-import PositionedCharacter from './models/PositionedCharacter';
+import Person from './models/Person';
 
 export default class GameState {
   constructor(turn = -1, level = 1, score = 0) {
@@ -16,7 +16,7 @@ export default class GameState {
       const persons = rowTeam.persons.map(
         (member) => {
           const character = CharacterController.restoreChar(member.character);
-          return new PositionedCharacter(character, member.position);
+          return new Person(character, member.position);
         },
       );
       return new Team(rowTeam.nation, rowTeam.startPos, rowTeam.ai, persons);

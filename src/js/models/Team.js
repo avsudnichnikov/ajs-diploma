@@ -1,4 +1,4 @@
-import PositionedCharacter from './PositionedCharacter';
+import Person from './Person';
 import CharacterController from '../CharacterController';
 import { randInt } from '../utils';
 import { generatePositions } from '../generators';
@@ -12,7 +12,7 @@ export default class Team {
   }
 
   * [Symbol.iterator]() {
-    for (let key = 0; key < this.length; key += 1) {
+    for (let key = 0; key < this.persons.length; key += 1) {
       yield this.persons[key];
     }
   }
@@ -31,7 +31,7 @@ export default class Team {
       positions = generatePositions(characters, this.startPos, boardSize);
     }
     characters.forEach((character, index) => {
-      this.add(new PositionedCharacter(character, positions[index]));
+      this.add(new Person(character, positions[index]));
     });
   }
 

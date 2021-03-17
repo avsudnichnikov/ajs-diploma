@@ -1,7 +1,7 @@
 import Character from './Character/Character';
 import DCoords from '../DCoords';
 
-export default class PositionedCharacter {
+export default class Person {
   constructor(character, position) {
     if (!(character instanceof Character)) {
       throw new Error('character must be instance of Character or its children');
