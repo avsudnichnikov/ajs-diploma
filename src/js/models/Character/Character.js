@@ -25,7 +25,7 @@ export default class Character {
     this.level += 1;
 
     if (emulate) {
-      this.health = randInt(100, 30);
+      this.health = randInt(100, 1);
     }
 
     const mod = (this.health > 30) ? (0.80 + this.health / 100) : 1;

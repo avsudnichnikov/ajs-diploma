@@ -100,6 +100,7 @@ export default class GameController {
     this.state.generateOptions = {
       characterCount: 3,
       maxLevel: 1,
+      minLevel: 1,
       boardSize: this.gamePlay.boardSize,
     };
 
@@ -171,8 +172,11 @@ export default class GameController {
   nextLevel() {
     this.state.level += 1;
 
+    const maxLevel = this.state.level + 1;
+    const minLevel = (maxLevel >= 3) ? (maxLevel - 3) : 1;
     this.state.generateOptions.characterCount = this.state.teams[0].length;
-    this.state.generateOptions.maxLevel = this.state.level + 1;
+    this.state.generateOptions.maxLevel = maxLevel;
+    this.state.generateOptions.minLevel = minLevel;
     this.state.teams[1].generateMembers(this.state.generateOptions);
 
     this.gamePlay.drawUi(themes[this.state.level % themes.length]);
