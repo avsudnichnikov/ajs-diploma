@@ -7,31 +7,39 @@ import Vampire from './models/Character/Undead/Vampire';
 import Daemon from './models/Character/Undead/Daemon';
 
 export default class CharacterController {
-  static allowedTypes = {
-    humans: [
-      Swordsman,
-      Bowman,
-      Magician,
-    ],
-    undead: [
-      Undead,
-      Vampire,
-      Daemon,
-    ],
+  static #allowedTypes = {
+    humans: {
+      swordsman: Swordsman,
+      bowman: Bowman,
+      magician: Magician,
+    },
+    undead: {
+      undead: Undead,
+      vampire: Vampire,
+      daemon: Daemon,
+    },
   }
 
   static getNations() {
-    return Object.keys(this.allowedTypes);
+    return Object.keys(this.#allowedTypes);
   }
 
   static getTypesByNation(nation) {
-    return this.allowedTypes[nation];
+    return Object.values(this.#allowedTypes[nation]);
+  }
+
+  static getTypeList(){
+    const result = {};
+    Object.values(this.#allowedTypes).forEach((nationTypes)=>{
+      Object.entries(nationTypes).forEach((type)=>{
+        result[type[0]] = type[1];
+      })
+    })
+    return result;
   }
 
   static getTypeByName(type) {
-    return Object.values(this.allowedTypes).flat().filter(
-      (item) => item.name.toLowerCase() === type,
-    )[0];
+    return this.getTypeList()[type];
   }
 
   static genChar(nation, maxLevel, minLevel, grade) {
