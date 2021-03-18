@@ -1,5 +1,6 @@
 import Team from './models/Team';
-import { getTooltipMsg, randInt } from './utils';
+import randInt from './randInt';
+import { getTooltipMsg } from './utils';
 import themes from './themes';
 import cursors from './cursors';
 
@@ -15,34 +16,38 @@ export default class GameController {
       self: 'self',
       nothing: null,
     };
+    this.private = {
+      selectedPerson: undefined,
+      hoverCell: undefined,
+    };
   }
 
   get selectedPerson() {
-    return this._selectedPerson;
+    return this.private.selectedPerson;
   }
 
   set selectedPerson(value) {
-    if (typeof this._selectedPerson === 'object') {
-      this.gamePlay.deselectCell(this._selectedPerson.position);
+    if (typeof this.private.selectedPerson === 'object') {
+      this.gamePlay.deselectCell(this.private.selectedPerson.position);
     }
     if (typeof value === 'object') {
       this.gamePlay.selectCell(value.position);
     }
-    this._selectedPerson = value;
+    this.private.selectedPerson = value;
   }
 
   get hoverCell() {
-    return this._hoverCell;
+    return this.private.hoverCell;
   }
 
   set hoverCell(value) {
-    if (typeof this._hoverCell === 'object') {
-      this.gamePlay.deselectCell(this._hoverCell.index);
+    if (typeof this.private.hoverCell === 'object') {
+      this.gamePlay.deselectCell(this.private.hoverCell.index);
     }
     if (typeof value === 'object') {
       this.gamePlay.selectCell(value.index, value.color);
     }
-    this._hoverCell = value;
+    this.private.hoverCell = value;
   }
 
   init() {
@@ -186,36 +191,37 @@ export default class GameController {
   aiTurn() {
     const team = this.state.teams[this.state.turn];
     const enemyPersons = this.getPersons(this.state.turn, false);
-    let attack;
-    let goAttack;
+    const attackers = [];
     for (const person of team) {
       const cells = person.getAttackCells(this.gamePlay.boardSize);
       const targets = [...enemyPersons.filter((item) => cells.includes(item.position))];
       targets.forEach((target) => {
         const damage = person.damage(target);
-        if (!attack || attack.damage < damage
-          || attack.target.character.health > target.character.health) {
-          attack = {
-            person,
-            target,
-            damage,
-          };
-        }
+        attackers.push({
+          person,
+          target,
+          damage,
+        });
       });
     }
-    if (attack) {
-      this.selectedPerson = attack.person;
-      this.attackSelectedPers(attack.target.position);
-    } else {
-      let allowedCells = [];
-      while (allowedCells.length === 0) {
-        this.selectedPerson = team.rand();
-        const persons = this.getPersons().map((item) => item.position);
-        const cells = this.selectedPerson.getMoveCells(this.gamePlay.boardSize);
-        allowedCells = cells.filter((item) => !persons.includes(item));
-      }
-      this.moveSelectedPers(allowedCells[randInt(allowedCells.length - 1)]);
+    if (attackers.length) {
+      const attacker = attackers.reduce((max, curr) => {
+        const maxTargHealth = max.target.character.health;
+        const currTargHealth = curr.target.character.health;
+        return ((max.damage < curr.damage) || (maxTargHealth > currTargHealth)) ? curr : max;
+      }, attackers[0]);
+      this.selectedPerson = attacker.person;
+      this.attackSelectedPers(attacker.target.position);
+      return;
     }
+    let allowedCells = [];
+    while (allowedCells.length === 0) {
+      this.selectedPerson = team.rand();
+      const persons = this.getPersons().map((item) => item.position);
+      const cells = this.selectedPerson.getMoveCells(this.gamePlay.boardSize);
+      allowedCells = cells.filter((item) => !persons.includes(item));
+    }
+    this.moveSelectedPers(allowedCells[randInt(allowedCells.length - 1)]);
   }
 
   getPersons(teamIndex, directSearch) {

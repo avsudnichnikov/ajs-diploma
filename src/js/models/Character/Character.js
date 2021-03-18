@@ -1,4 +1,4 @@
-import { randInt } from '../../utils';
+import randInt from '../../randInt';
 
 export default class Character {
   constructor(baseAttr, level) {

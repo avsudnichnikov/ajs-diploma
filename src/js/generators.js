@@ -1,7 +1,7 @@
-import { randInt } from './utils';
+import randInt from './randInt';
 import DCoords from './DCoords';
 
-export function generatePositions(characters, startPos, boardSize) {
+export default function generatePositions(characters, startPos, boardSize) {
   const leftSide = startPos === 'left';
   const positions = new Set();
 

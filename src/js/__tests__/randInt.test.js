@@ -1,4 +1,4 @@
-import { randInt } from '../../utils';
+import randInt from '../randInt';
 
 test('max - 0, min - 0', () => {
   const expectedMax = 0;

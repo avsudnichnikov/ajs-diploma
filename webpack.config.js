@@ -1,7 +1,7 @@
 const path = require('path');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
   output: {
@@ -14,14 +14,14 @@ module.exports = {
   devServer: {
     contentBase: './dist',
   },
-  stats: "errors-only",
+  stats: 'errors-only',
   module: {
     rules: [
       {
         test: /\.js$/,
-        enforce: "pre",
+        enforce: 'pre',
         use: [
-          'source-map-loader'
+          'source-map-loader',
         ],
       },
       {
@@ -34,12 +34,12 @@ module.exports = {
               '@babel/plugin-proposal-private-methods',
               '@babel/plugin-proposal-class-properties',
             ],
-          }
+          },
         },
       },
       {
         test: /\.html$/,
-        use: [{loader: 'html-loader'},
+        use: [{ loader: 'html-loader' },
         ],
       },
       {

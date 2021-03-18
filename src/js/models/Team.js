@@ -1,7 +1,7 @@
 import Person from './Person';
 import CharacterController from '../CharacterController';
-import { randInt } from '../utils';
-import { generatePositions } from '../generators';
+import randInt from '../randInt';
+import generatePositions from '../generators';
 
 export default class Team {
   constructor(nation, startPos, ai = false, persons = []) {
@@ -51,7 +51,7 @@ export default class Team {
     this.addFew(characters, boardSize);
   }
 
-  #findIndexByPos(position) {
+  findIndexByPos(position) {
     return this.persons.findIndex((item) => item.position === position) || null;
   }
 
@@ -67,6 +67,6 @@ export default class Team {
   }
 
   delete(position) {
-    this.persons.splice(this.#findIndexByPos(position), 1);
+    this.persons.splice(this.findIndexByPos(position), 1);
   }
 }

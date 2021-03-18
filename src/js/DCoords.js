@@ -1,4 +1,15 @@
 export default class DCoords {
+  static unitVectors = [
+    { x: -1, y: -1 },
+    { x: -1, y: 0 },
+    { x: -1, y: 1 },
+    { x: 0, y: -1 },
+    { x: 0, y: 1 },
+    { x: 1, y: -1 },
+    { x: 1, y: 0 },
+    { x: 1, y: 1 },
+  ];
+
   static coordsToPos(coords, boardSize) {
     return coords.x + coords.y * boardSize;
   }
@@ -71,19 +82,8 @@ export default class DCoords {
   static getLines(position, dist, boardSize) {
     const positions = [];
     const coordsO = this.posToCoords(position, boardSize);
-    const vectors = [
-      { x: -1, y: -1 },
-      { x: -1, y: 0 },
-      { x: -1, y: 1 },
-      { x: 0, y: -1 },
-      { x: 0, y: 1 },
-      { x: 1, y: -1 },
-      { x: 1, y: 0 },
-      { x: 1, y: 1 },
-    ];
-
     for (let i = 1; i <= dist; i += 1) {
-      const cells = vectors.map(
+      const cells = this.unitVectors.map(
         (vector) => this.shiftCoordsToVector(coordsO, vector, i),
       );
       cells.forEach((cell) => {

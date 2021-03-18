@@ -1,4 +1,4 @@
-import { randInt } from './utils';
+import randInt from './randInt';
 import Swordsman from './models/Character/Humans/Swordsman';
 import Bowman from './models/Character/Humans/Bowman';
 import Magician from './models/Character/Humans/Magician';
@@ -28,14 +28,10 @@ export default class CharacterController {
     return Object.values(this.#allowedTypes[nation]);
   }
 
-  static getTypeList(){
-    const result = {};
-    Object.values(this.#allowedTypes).forEach((nationTypes)=>{
-      Object.entries(nationTypes).forEach((type)=>{
-        result[type[0]] = type[1];
-      })
-    })
-    return result;
+  static getTypeList() {
+    return Object.values(this.#allowedTypes).reduce(
+      (result, nations) => ({ ...nations, ...result }), {},
+    );
   }
 
   static getTypeByName(type) {
